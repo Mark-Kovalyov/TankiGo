@@ -17,7 +17,16 @@ public class DiscardServerHandler extends ChannelInboundHandlerAdapter{
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf bb = (ByteBuf) msg;
         try{
-            logger.info("Message received!");
+            StringBuilder sb = new StringBuilder();
+            while (bb.isReadable()) { // (1)
+                byte b = bb.readByte();
+                if (b >= 32 && b < 128) {
+                    sb.append((char)b);
+                } else {
+                    sb.append(String.format("%X02",b));
+                }
+            }
+            logger.info("Message received: {}", sb.toString());
         } finally {
             bb.release();
         }
